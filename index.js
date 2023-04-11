@@ -1,6 +1,8 @@
 const fs = require("fs");
 const http = require("http");
 const url = require("url");
+const slugify = require("slugify");
+const replaceTemplate = require("./modules/replaceTemplate");
 ///////////////////////////////////////////////////////////////
 // FILES
 // // Blocking, synchronous way
@@ -30,21 +32,51 @@ const url = require("url");
 
 ///////////////////////////////////////////////////////////////
 // Server
+
+const tempOverview = fs.readFileSync(
+  `${__dirname}/templates/template-overview.html`,
+  "utf-8"
+);
+const tempCard = fs.readFileSync(
+  `${__dirname}/templates/template-card.html`,
+  "utf-8"
+);
+const tempProduct = fs.readFileSync(
+  `${__dirname}/templates/template-product.html`,
+  "utf-8"
+);
 const data = fs.readFileSync(`${__dirname}/dev-data/data.json`, "utf-8");
 const dataObject = JSON.parse(data);
-console.log(`Data`, data);
-console.log(`DataObj`, dataObject);
-
+const slugs = dataObject.map((el) => slugify(el.productName, { lower: true }));
+console.log(slugs);
 const server = http.createServer((req, res) => {
-  console.log(req.url);
-  const pathName = req.url;
-  if (pathName === "/" || pathName === "/overview") {
-    res.end("This is the overview");
-  } else if (pathName === "/product") {
-    res.end("This is the product");
-  } else if (pathName === "/api") {
+  const { query, pathname } = url.parse(req.url, true);
+
+  // Overview
+  if (pathname === "/" || pathname === "/overview") {
+    res.writeHead(200, { "Content-type": "text/html" });
+    const cardsHtml = dataObject
+      .map((el) => replaceTemplate(tempCard, el))
+      .join("");
+    // Without 'join method' the output will be an array of html
+    //
+    const output = tempOverview.replace("{%PRODUCT_CARDS%}", cardsHtml);
+
+    res.end(output);
+
+    // Product
+  } else if (pathname === "/product") {
+    res.writeHead(200, { "Content-type": "text/html" });
+    const product = dataObject[query.id];
+    const output = replaceTemplate(tempProduct, product);
+    res.end(output);
+
+    // API
+  } else if (pathname === "/api") {
     res.writeHead(200, { "Content-type": "application/json" });
     res.end(data);
+
+    // NOt Found
   } else {
     res.writeHead(404, {
       "Content-type": "text/html",

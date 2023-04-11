@@ -1,0 +1,25 @@
+{
+  "name": "node-farm",
+  "version": "1.0.0",
+  "description": "Basic node.js for learning",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KPanuwat-S/basic-node-project.git"
+  },
+  "author": "Panuwat Kummaboot",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/KPanuwat-S/basic-node-project/issues"
+  },
+  "homepage": "https://github.com/KPanuwat-S/basic-node-project#readme",
+  "dependencies": {
+    "slugify": "^1.6.6"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22"
+  }
+}
